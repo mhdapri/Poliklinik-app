@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\ExportService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -87,5 +88,33 @@ class PasienController extends Controller
         return redirect()->route('pasien.index')
             ->with('message', 'Data Pasien Berhasil di Hapus')
             ->with('type', 'success');
+    }
+
+    public function export()
+    {
+        $data = ExportService::exportPasienData();
+        
+        return $this->streamCSV('Data_Pasien_' . now()->format('Y-m-d_His') . '.csv', $data);
+    }
+
+    private function streamCSV($filename, $data)
+    {
+        $headers = [
+            "Content-type" => "text/csv; charset=utf-8",
+            "Content-Disposition" => "attachment; filename=$filename",
+        ];
+
+        return response()->stream(
+            function () use ($data) {
+                $handle = fopen('php://output', 'w');
+                fwrite($handle, "\xEF\xBB\xBF");
+                foreach ($data as $row) {
+                    fputcsv($handle, $row, ';');
+                }
+                fclose($handle);
+            },
+            200,
+            $headers
+        );
     }
 }

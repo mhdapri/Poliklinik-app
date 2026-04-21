@@ -98,8 +98,16 @@
                 <i class="fas fa-house-medical w-4 text-center"></i>
                 Dashboard Pasien
             </a>
-
-
+            <a href="{{ route('pasien.riwayat.index') }}"
+                class="{{ $baseLink }} {{ request()->routeIs('pasien.riwayat.*') ? $active : $inactive }}">
+                <i class="fas fa-history w-4 text-center"></i>
+                Riwayat Pasien
+            </a>
+            <a href="{{ route('pasien.pembayaran.index') }}"
+                class="{{ $baseLink }} {{ request()->routeIs('pasien.pembayaran.*') ? $active : $inactive }}">
+                <i class="fas fa-money-bill-wave w-4 text-center"></i>
+                Pembayaran Pasien
+            </a>
         </div>
         @endif
 

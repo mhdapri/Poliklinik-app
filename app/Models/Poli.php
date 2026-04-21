@@ -18,4 +18,9 @@ class Poli extends Model
     {
         return $this->hasMany(User::class, 'id_poli');
     }
+
+    public function jadwalPeriksa()
+    {
+        return $this->hasMany(JadwalPeriksa::class, 'id_poli');
+    }
 }

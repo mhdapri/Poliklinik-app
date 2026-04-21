@@ -25,4 +25,16 @@ class Periksa extends Model
     {
         return $this->hasMany(DetailPeriksa::class, 'id_periksa');
     }
+
+    public function pembayaran()
+    {
+        return $this->hasOneThrough(
+            Pembayaran::class,
+            DaftarPoli::class,
+            'id',
+            'id_daftar_poli',
+            'id_daftar_poli',
+            'id'
+        );
+    }
 }
