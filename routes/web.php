@@ -12,6 +12,9 @@ use App\Http\Controllers\Pasien\DashboardController;
 use App\Http\Controllers\Pasien\RiwayatPendaftaranController;
 use App\Http\Controllers\Pasien\PembayaranController as PasienPembayaran;
 
+
+use App\Http\Controllers\Dokter\JadwalPeriksaController;
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -43,31 +46,39 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 
 // ================= DOKTER ROLE =================
 Route::middleware(['auth', 'role:dokter'])->prefix('dokter')->group(function () {
-    Route::get('/dashboard', [\App\Http\Controllers\Dokter\DashboardController::class, 'index'])->name('dokter.dashboard');
-    
-    
-    Route::get('/jadwal/export', [\App\Http\Controllers\Dokter\JadwalController::class, 'export'])->name('dokter.jadwal.export');
-    Route::get('/riwayat-periksa/export', [\App\Http\Controllers\Dokter\RiwayatPeriksaController::class, 'export'])->name('dokter.riwayat-periksa.export');
+    Route::get('/dashboard', function () {
+        return view('dokter.dashboard');
+    })->name('dokter.dashboard');
 
-    Route::resource('jadwal', \App\Http\Controllers\Dokter\JadwalController::class)->only(['index', 'show']);
-    Route::post('/jadwal/{jadwal}/update-queue', [\App\Http\Controllers\Dokter\JadwalController::class, 'updateQueueNumber'])->name('jadwal.update-queue');
-    Route::resource('riwayat-periksa', \App\Http\Controllers\Dokter\RiwayatPeriksaController::class)->only(['index', 'show']);
+    Route::resource('jadwal-periksa', JadwalPeriksaController::class);
+    
 });
 
+use App\Http\Controllers\Pasien\PoliController as PasienPoliController;
 
 Route::middleware(['auth', 'role:pasien'])->prefix('pasien')->group(function () {
-    
-    // 1. Dashboard & Antrian (Folder: pasien/dashboard)
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('pasien.dashboard');
-    Route::post('/dashboard', [DashboardController::class, 'store'])->name('pasien.dashboard.store');
-    Route::get('/queue/{jadwal}', [DashboardController::class, 'getQueueUpdate'])->name('pasien.queue');
+    Route::get('/dashboard', function () {
+        return view('pasien.dashboard');
+    })->name('pasien.dashboard');
 
-    // 2. Riwayat Pendaftaran (Folder: pasien/riwayat) - Poin 3
-    Route::get('/riwayat', [RiwayatPendaftaranController::class, 'index'])->name('pasien.riwayat.index');
-    Route::get('/riwayat/{id}', [RiwayatPendaftaranController::class, 'show'])->name('pasien.riwayat.show');
-
-    // 3. Pembayaran (Folder: pasien/pembayaran) - Poin 6
+    Route::get('/daftar', [PasienPoliController::class, 'get'])->name('pasien.daftar');
+    Route::post('/daftar', [PasienPoliController::class, 'submit'])->name('pasien.daftar.submit');
     Route::get('/pembayaran', [PasienPembayaran::class, 'index'])->name('pasien.pembayaran.index');
-    Route::get('/pembayaran/{id}/upload', [PasienPembayaran::class, 'create'])->name('pasien.pembayaran.create'); // Form Upload
-    Route::post('/pembayaran/{id}/upload', [PasienPembayaran::class, 'upload'])->name('pasien.pembayaran.store'); // Proses Simpan
 });
+
+// Route::middleware(['auth', 'role:pasien'])->prefix('pasien')->group(function () {
+    
+//     // 1. Dashboard & Antrian (Folder: pasien/dashboard)
+//     Route::get('/dashboard', [DashboardController::class, 'index'])->name('pasien.dashboard');
+//     Route::post('/dashboard', [DashboardController::class, 'store'])->name('pasien.dashboard.store');
+//     Route::get('/queue/{jadwal}', [DashboardController::class, 'getQueueUpdate'])->name('pasien.queue');
+
+//     // 2. Riwayat Pendaftaran (Folder: pasien/riwayat) - Poin 3
+//     Route::get('/riwayat', [RiwayatPendaftaranController::class, 'index'])->name('pasien.riwayat.index');
+//     Route::get('/riwayat/{id}', [RiwayatPendaftaranController::class, 'show'])->name('pasien.riwayat.show');
+
+//     // 3. Pembayaran (Folder: pasien/pembayaran) - Poin 6
+//     Route::get('/pembayaran', [PasienPembayaran::class, 'index'])->name('pasien.pembayaran.index');
+//     Route::get('/pembayaran/{id}/upload', [PasienPembayaran::class, 'create'])->name('pasien.pembayaran.create'); // Form Upload
+//     Route::post('/pembayaran/{id}/upload', [PasienPembayaran::class, 'upload'])->name('pasien.pembayaran.store'); // Proses Simpan
+// });
