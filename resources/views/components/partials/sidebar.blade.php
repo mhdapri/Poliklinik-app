@@ -80,6 +80,12 @@
                  Manajemen Obat
             </a>
 
+            <a href="{{ route('admin.pembayaran.index') }}"
+                class="{{ $baseLink }} {{ request()->routeIs('admin.pembayaran.*') ? $active : $inactive }}">
+                <i class="fas fa-cash-register w-4 text-center"></i>
+                 Verifikasi Pembayaran
+            </a>
+
         </div>
         @endif
 
@@ -127,14 +133,23 @@
                 Dashboard Dokter
             </a>
 
+
             <a href="{{ route('jadwal-periksa.index') }}"
                 class="{{ $baseLink }} {{ request()->routeIs('jadwal-periksa.*') ? $active : $inactive }}">
-                <i class="fas fa-stethoscope w-4 text-center"></i>
+                <i class="fas fa-calendar-check w-4 text-center"></i>
                 Jadwal Periksa
             </a>
-
+            <a href="{{ route('periksa-pasien.index') }}"
+                class="{{ $baseLink }} {{ request()->routeIs('periksa-pasien.*') ? $active : $inactive }}">
+                <i class="fas fa-calendar-check w-4 text-center"></i>
+                Periksa Pasien
+            </a>
             
-
+            <a href="{{ route('riwayat-pasien.index') }}"
+                class="{{ $baseLink }} {{ request()->routeIs('riwayat-pasien.*') ? $active : $inactive }}">
+                <i class="fas fa-notes-medical w-4 text-center"></i>
+                <span class="ml-2">Riwayat Pasien</span>
+            </a>
         </div>
         @endif
 

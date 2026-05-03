@@ -13,29 +13,32 @@ class PembayaranController extends Controller
 {
     public function index()
     {
-        $pasien = Auth::user();
+        $pasienId = Auth::user()->pasien->id;
         
-       $pendingPayments = Pembayaran::whereHas('daftarPoli', function ($query) use ($pasien) {
-            $query->where('id_pasien', $pasien->id);
-        })
-            ->with('daftarPoli.jadwalPeriksa.poli', 'daftarPoli.jadwalPeriksa.dokter')
-            ->orderByDesc('created_at')
+        // Menampilkan daftar pemeriksaan yang butuh pembayaran
+        $tagihan = DaftarPoli::where('id_pasien', $pasienId)
+            ->whereHas('periksa')
+            ->with(['periksa.detailPeriksas.obat', 'pembayaran', 'jadwalPeriksa.poli', 'jadwalPeriksa.dokter'])
+            ->latest()
             ->paginate(10);
-        
-        return view('pasien.pembayaran.index', compact('pendingPayments'));
+
+        return view('pasien.pembayaran.index', compact('tagihan'));
     }
 
-    public function show($id)
+    public function show($id_daftar_poli)
     {
-        $pasien = Auth::user();
+        $daftarPoli = DaftarPoli::with(['periksa.detailPeriksas.obat', 'pasien'])->findOrFail($id_daftar_poli);
         
-        $pembayaran = Pembayaran::with('daftarPoli.jadwalPeriksa.poli', 'daftarPoli.jadwalPeriksa.dokter')
-            ->whereHas('daftarPoli', function ($query) use ($pasien) {
-                $query->where('id_pasien', $pasien->id);
-            })
-            ->findOrFail($id);
-        
-        return view('pasien.detail-pembayaran', compact('pembayaran'));
+        // Proteksi: Pastikan pasien hanya bisa lihat tagihan miliknya sendiri
+        if ($daftarPoli->id_pasien !== Auth::user()->pasien->id) {
+            abort(403, 'Akses ditolak.');
+        }
+
+        $biayaJasaDokter = 150000;
+        $totalHargaObat = $daftarPoli->periksa->detailPeriksas->sum(fn($d) => $d->obat->harga ?? 0);
+        $biayaTotal = $biayaJasaDokter + $totalHargaObat;
+
+        return view('pasien.pembayaran.upload', compact('daftarPoli', 'biayaTotal'));
     }
 
     public function create($id) // Menampilkan Form Upload
@@ -66,5 +69,39 @@ class PembayaranController extends Controller
         }
         
         return redirect()->route('pasien.pembayaran.index')->with('success', 'Bukti berhasil diunggah!');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'id_daftar_poli' => 'required',
+            'bukti_pembayaran' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $path = $request->file('bukti_pembayaran')->store('bukti_pembayaran', 'public');
+
+        Pembayaran::updateOrCreate(
+            ['id_daftar_poli' => $request->id_daftar_poli],
+            [
+                'biaya_total' => $request->biaya_total,
+                'bukti_pembayaran' => $path,
+                'status' => 'pending_verification'
+            ]
+        );
+
+        return redirect()->route('pasien.pembayaran.index')->with('success', 'Bukti berhasil diunggah!');
+    }
+
+    public function verifikasi(Request $request, $id)
+    {
+        $pembayaran = \App\Models\Pembayaran::findOrFail($id);
+        
+        // Admin memilih status: verified atau rejected
+        $pembayaran->update([
+            'status' => $request->status, // 'verified' atau 'rejected'
+            'catatan_admin' => $request->catatan // jika ada alasan penolakan
+        ]);
+
+        return back()->with('success', 'Status pembayaran berhasil diperbarui.');
     }
 }

@@ -12,7 +12,12 @@
             Tambah Jadwal Periksa
         </a>
     </div>
-
+    @foreach($jadwalPeriksas as $jadwal)
+        <form action="{{ route('dokter.panggil', $jadwal->id) }}" method="POST">
+            @csrf
+            <button>Panggil</button>
+        </form>
+    @endforeach
     {{-- Alert Flash Message --}}
     @if (session('message'))
     <div class="alert alert-{{ session('type', 'success') }} alert-dismissible mb-4 rounded-xl shadow-sm" role="alert">
@@ -62,7 +67,14 @@
 
                             <td class="px-6 py-4 text-right">
                                 <div class="flex justify-end gap-2">
-
+                                    
+                                     <form action="{{ route('dokter.panggil', $jadwalPeriksa->id) }}" method="POST">
+                                        @csrf
+                                        <button class="btn btn-sm bg-green-500 hover:bg-green-600 text-white rounded-lg px-4">
+                                            <i class="fas fa-bullhorn"></i>
+                                            Panggil
+                                        </button>
+                                    </form>
                                     {{-- Edit --}}
                                     <a href="{{ route('jadwal-periksa.edit', $jadwalPeriksa->id) }}" class="btn btn-sm bg-amber-500 hover:bg-amber-600 
                                                   text-white border-none rounded-lg px-4">

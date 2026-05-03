@@ -14,8 +14,8 @@
                     </div>
                     <div class="text-right">
                         <span class="block text-xs uppercase font-bold text-blue-200 mb-1">Nomor Antrian</span>
-                        <span class="bg-yellow-400 text-blue-900 px-6 py-2 rounded-lg font-black text-3xl shadow-inner">
-                            {{ $activeRegistration->no_antrian }}
+                        <span class="bg-yellow-400 text-blue-900 w-20 h-20 flex items-center justify-center rounded-2xl font-black text-4xl shadow-xl border-b-4 border-yellow-600 transform hover:scale-105 transition-transform">
+                            {{ $activeRegistration->no_antrian ?? '-' }}
                         </span>
                     </div>
                 </div>

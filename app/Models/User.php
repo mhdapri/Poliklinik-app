@@ -66,4 +66,15 @@ class User extends Authenticatable
     {
         return $this->hasMany(DaftarPoli::class, 'id_pasien');
     }
+    public function pasien()
+{
+    // Sesuaikan foreign_key-nya, biasanya 'id_user'
+    return $this->hasOne(Pasien::class, 'id_user'); 
+}   
+
+    public function dokter()
+{
+    // Pastikan foreign key-nya (id_user/user_id) sesuai dengan tabel dokter kamu
+    return $this->hasOne(Dokter::class, 'id'); 
+}
 }

@@ -14,9 +14,11 @@ class Poli extends Model
         'keterangan',
     ];
 
-    public function dokters()
+    public function dokter()
     {
         return $this->hasMany(User::class, 'id_poli');
+        return $this->hasMany(Dokter::class, 'id_poli');
+        
     }
 
     public function jadwalPeriksa()

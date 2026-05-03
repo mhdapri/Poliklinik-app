@@ -13,7 +13,7 @@ class RiwayatPendaftaranController extends Controller
         $pasien = Auth::user();
         
         $registrations = DaftarPoli::where('id_pasien', $pasien->id)
-            ->with(['jadwalPeriksa.dokter', 'jadwalPeriksa.poli', 'periksas.detailPeriksas.obat'])
+            ->with(['jadwalPeriksa.dokter', 'jadwalPeriksa.poli', 'periksa.detailPeriksas.obat'])
             ->orderByDesc('created_at')
             ->paginate(10);
         
@@ -26,10 +26,10 @@ class RiwayatPendaftaranController extends Controller
         
         $daftarPoli = DaftarPoli::where('id', $id)
             ->where('id_pasien', $pasien->id)
-            ->with(['jadwalPeriksa.dokter', 'jadwalPeriksa.poli', 'periksas.detailPeriksas.obat'])
+            ->with(['jadwalPeriksa.dokter', 'jadwalPeriksa.poli', 'periksa.detailPeriksas.obat'])
             ->firstOrFail();
         
-        $periksa = $daftarPoli->periksas()->first();
+        $periksa = $daftarPoli->periksa;
         
         return view('pasien.riwayat.show', compact('daftarPoli', 'periksa'));
     }

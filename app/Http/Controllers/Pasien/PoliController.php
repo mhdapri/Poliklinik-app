@@ -33,14 +33,43 @@ class PoliController extends Controller
             'id_pasien' => 'required|exists:users,id',
         ]);
 
+        $cek = DaftarPoli::where('id_pasien', $request->id_pasien)
+            ->whereIn('status', ['pending', 'proses'])
+            ->exists();
+
+        if ($cek) {
+            return back()->withErrors(['msg' => 'Anda masih memiliki antrian aktif!']);
+        }
+
+        // baru create
         $jumlahSudahDaftar = DaftarPoli::where('id_jadwal', $request->id_jadwal)->count();
-        $daftar = DaftarPoli::create([
+
+        DaftarPoli::create([
             'id_pasien' => $request->id_pasien,
             'id_jadwal' => $request->id_jadwal,
             'keluhan' => $request->keluhan,
             'no_antrian' => $jumlahSudahDaftar + 1,
+            'status' => 'pending',
         ]);
+        return redirect()->route('pasien.dashboard')->with('success', 'Berhasil mendaftar!');
+        // $jumlahSudahDaftar = DaftarPoli::where('id_jadwal', $request->id_jadwal)->count();
+        // $daftar = DaftarPoli::create([
+        //     'id_pasien' => $request->id_pasien,
+        //     'id_jadwal' => $request->id_jadwal,
+        //     'keluhan' => $request->keluhan,
+        //     'no_antrian' => $jumlahSudahDaftar + 1,
+        //     'status' => 'pending',
+        // ]);
 
-        return redirect()->back()->with('message', 'Berhasil Mendaftar ke Poli')->with('type', 'success');
+        // $cek = DaftarPoli::where('id_pasien', $request->id_pasien)
+
+        // ->whereNotIn('status', [ 'selesai', 'dibatalkan'])
+        // ->exists();
+
+        // if ($cek) {
+        //     return back()->withErrors(['msg' => 'Anda masih memiliki antrian aktif!']);
+        // }
+
+        // return redirect()->back()->with('message', 'Berhasil Mendaftar ke Poli')->with('type', 'success');
     }
 }
