@@ -39,7 +39,7 @@
                                 Nomor Rekam Medis
                             </label>
 
-                            <input type="text" value="{{ $user->no_rm }}"
+                            <input type="text" value="{{ $user->no_rm ?? '-' }}"
                                 class="w-full border-2 rounded-lg p-2 bg-gray-100" disabled>
                         </div>
 

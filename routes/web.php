@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Pasien\DashboardController as PasienDashboard;
 use App\Http\Controllers\Pasien\RiwayatPendaftaranController;
 use App\Http\Controllers\Pasien\PembayaranController as PasienPembayaran;
+use App\Http\Controllers\Pasien\PoliController as PasienPoliController;
 
 
 use App\Http\Controllers\Dokter\JadwalPeriksaController;
@@ -71,14 +72,15 @@ Route::middleware(['auth', 'role:dokter'])->prefix('dokter')->group(function () 
     
 });
 
-use App\Http\Controllers\Pasien\PoliController as PasienPoliController;
+
+
 
 Route::middleware(['auth', 'role:pasien'])->prefix('pasien')->group(function () {
-    // Route::get('/dashboard', function () {
-    //     return view('pasien.dashboard');
-    // })->name('pasien.dashboard');
-    Route::get('/dashboard', [PasienDashboard::class, 'index'])->name('pasien.dashboard');
-    Route::post('/dashboard', [PasienDashboard::class, 'store'])->name('pasien.dashboard.store');
+    Route::get('/dashboard', function () {
+        return view('pasien.dashboard');
+    })->name('pasien.dashboard');
+    Route::get('/daftar', [PasienPoliController::class, 'get'])->name('pasien.daftar');
+    Route::post('/daftar', [PasienPoliController::class, 'submit'])->name('pasien.daftar.submit');
     Route::get('/daftar', [PasienPoliController::class, 'get'])->name('pasien.daftar');
     Route::post('/daftar', [PasienPoliController::class, 'submit'])->name('pasien.daftar.submit');
     Route::get('/pembayaran', [PasienPembayaran::class, 'index'])->name('pasien.pembayaran.index');

@@ -1,4 +1,19 @@
 <x-layouts.app title="Dashboard Pasien">
+    @php
+        if (!Auth::user()->pasien) {
+            return redirect()->route('home')->with('error', 'Anda belum terdaftar sebagai pasien.');
+        }
+        $pasienId = Auth::user()->pasien->id;
+
+        // 1. Cari antrean yang masih 'pending' atau 'proses' (Hanya 1)
+        $antrianAktif = \App\Models\DaftarPoli::with(['jadwalPeriksa.dokter', 'jadwalPeriksa.poli'])
+            ->where('id_pasien', $pasienId)
+            ->whereIn('status', ['pending', 'proses'])
+            ->first();
+
+        // 2. Ambil semua jadwal untuk tabel bawah
+        $jadwalPolis = \App\Models\JadwalPeriksa::with(['dokter', 'poli'])->get();
+    @endphp
     <div class="p-6" x-data="{ currentServing: {} }" x-init="
         {{-- Simulasi Live Update: Ambil data setiap 5 detik --}}
         setInterval(() => {
