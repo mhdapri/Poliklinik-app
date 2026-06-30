@@ -68,7 +68,24 @@
                                 @endif
                              </td>
                             <td class="px-6 py-4 text-right">
-                                <div class="flex justify-end gap-2">
+                                <div class="flex justify-end gap-2 flex-wrap">
+                                    <form action="{{ route('obat.stock-adjust', $obat->id) }}" method="POST" class="flex items-center gap-1">
+                                        @csrf
+                                        <input type="hidden" name="action" value="add">
+                                        <input type="number" name="jumlah" value="10" min="1" class="w-16 border rounded px-2 py-1 text-xs">
+                                        <button type="submit" class="inline-flex items-center gap-1 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg transition">
+                                            + Stok
+                                        </button>
+                                    </form>
+
+                                    <form action="{{ route('obat.stock-adjust', $obat->id) }}" method="POST" class="flex items-center gap-1">
+                                        @csrf
+                                        <input type="hidden" name="action" value="reduce">
+                                        <input type="number" name="jumlah" value="1" min="1" class="w-16 border rounded px-2 py-1 text-xs">
+                                        <button type="submit" class="inline-flex items-center gap-1 px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg transition">
+                                            - Stok
+                                        </button>
+                                    </form>
 
                                     {{-- Edit --}}
                                     <a href="{{ route('obat.edit', $obat->id) }}" class="inline-flex items-center gap-1 px-4 py-2 

@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     @vite(['resources/js/app.js','resources/css/app.css'])
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -33,17 +34,17 @@
 
             <div class="main-scroll">
 
-                @if(session('success'))
+                @if(session('success') || (session('message') && session('type') === 'success'))
                 <div class="alert alert-success mb-4 rounded-xl shadow-sm">
                     <i class="fas fa-check-circle"></i>
-                    <span>{{ session('success') }}</span>
+                    <span>{{ session('success') ?? session('message') }}</span>
                 </div>
                 @endif
 
-                @if(session('error'))
+                @if(session('error') || (session('message') && (session('type') === 'error' || session('type') === 'danger')))
                 <div class="alert alert-error mb-4 rounded-xl shadow-sm">
                     <i class="fas fa-circle-xmark"></i>
-                    <span>{{ session('error') }}</span>
+                    <span>{{ session('error') ?? session('message') }}</span>
                 </div>
                 @endif
 
@@ -83,7 +84,8 @@
             }
         }
     </script>
-
+    
+    
     @stack('scripts')
 
 </body>

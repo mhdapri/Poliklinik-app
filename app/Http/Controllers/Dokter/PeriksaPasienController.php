@@ -35,6 +35,8 @@ class PeriksaPasienController extends Controller
             'id_daftar_poli' => 'required',
             'catatan' => 'required',
             'id_obat' => 'nullable|array',
+            'jumlah' => 'nullable|array',
+            'jumlah.*' => 'required|integer|min:1',
         ]);
 
         DB::beginTransaction();
@@ -55,22 +57,26 @@ class PeriksaPasienController extends Controller
             // 2. Olah Obat dan Potong Stok
             if ($request->has('id_obat')) {
                 foreach ($request->id_obat as $obatId) {
-                    $obat = Obat::findOrFail($obatId);
+                    $jumlah = (int) ($request->jumlah[$obatId] ?? 1);
+                    $obat = Obat::lockForUpdate()->findOrFail($obatId);
 
                     if ($obat->stok <= 0) {
-                        throw new \Exception("Stok obat '{$obat->nama_obat}' habis!");
+                        throw new \Exception("Obat {$obat->nama_obat} sudah habis.");
                     }
 
-                    // Potong stok
-                    $obat->stok -= 1;
+                    if ($obat->stok < $jumlah) {
+                        throw new \Exception("Stok {$obat->nama_obat} hanya tersisa {$obat->stok}.");
+                    }
+                    $obat->stok -= $jumlah;
                     $obat->save();
 
                     DetailPeriksa::create([
                         'id_periksa' => $periksa->id,
                         'id_obat' => $obatId,
+                        'jumlah' => $jumlah,
                     ]);
 
-                    $totalHargaObat += $obat->harga;
+                    $totalHargaObat += $obat->harga * $jumlah;
                 }
             }
 
@@ -87,7 +93,7 @@ class PeriksaPasienController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
         }
     }
 }

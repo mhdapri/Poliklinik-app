@@ -1,42 +1,50 @@
 <?php
 
-namespace App\Http\Controllers\Dokter; 
+namespace App\Http\Controllers\Dokter;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class RiwayatPasienController extends Controller
 {
+    private function getDokterId()
+    {
+        $user = Auth::user();
+
+        if (! $user) {
+            abort(403, 'Anda belum login.');
+        }
+
+        return $user->id;
+    }
+
     public function index()
     {
-        // 1. Ambil ID dokter yang sedang login
-        $dokter = auth()->user()->dokter;
+        $dokterId = $this->getDokterId();
 
-        // 2. Ambil data (Pastikan nama variabelnya '$riwayat' pakai R kecil)
         $riwayat = \App\Models\DaftarPoli::with(['pasien', 'periksa'])
-            ->whereHas('jadwalPeriksa', function($q) use ($dokter) {
-                $q->where('id_dokter', $dokter->id);
+            ->whereHas('jadwalPeriksa', function ($q) use ($dokterId) {
+                $q->where('id_dokter', $dokterId);
             })
-            ->whereHas('periksa') // Hanya ambil data yang memiliki periksa
-            ->where('status', 'selesai') // Sesuaikan dengan status di database kamu
+            ->whereHas('periksa')
+            ->where('status', 'selesai')
             ->paginate(15);
 
-        // 3. KIRIM KE VIEW (Ini bagian yang paling penting!)
-        return view('dokter.riwayat.index', compact('riwayat')); 
+        return view('dokter.riwayat.index', compact('riwayat'));
     }
 
     public function show($id)
     {
-        $dokter = auth()->user()->dokter;
-        
+        $dokterId = $this->getDokterId();
+
         $riwayat = \App\Models\DaftarPoli::with(['pasien', 'periksa'])
-            ->whereHas('jadwalPeriksa', function($q) use ($dokter) {
-                $q->where('id_dokter', $dokter->id);
+            ->whereHas('jadwalPeriksa', function ($q) use ($dokterId) {
+                $q->where('id_dokter', $dokterId);
             })
             ->where('id', $id)
             ->first();
 
-        if (!$riwayat) {
+        if (! $riwayat) {
             abort(404);
         }
 
@@ -45,11 +53,11 @@ class RiwayatPasienController extends Controller
 
     public function export()
     {
-        $dokter = auth()->user()->dokter;
+        $dokterId = $this->getDokterId();
 
         $riwayat = \App\Models\DaftarPoli::with(['pasien', 'periksa'])
-            ->whereHas('jadwalPeriksa', function($q) use ($dokter) {
-                $q->where('id_dokter', $dokter->id);
+            ->whereHas('jadwalPeriksa', function ($q) use ($dokterId) {
+                $q->where('id_dokter', $dokterId);
             })
             ->whereHas('periksa')
             ->where('status', 'selesai')

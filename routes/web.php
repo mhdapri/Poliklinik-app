@@ -44,6 +44,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::resource('dokter', DokterController::class);
     Route::resource('pasien', PasienController::class);
     Route::resource('obat', ObatController::class);
+    Route::post('/obat/{id}/stock-adjust', [ObatController::class, 'adjustStock'])->name('obat.stock-adjust');
     
     
     Route::resource('pembayaran', AdminPembayaran::class)->only(['index', 'show'])->names('admin.pembayaran');

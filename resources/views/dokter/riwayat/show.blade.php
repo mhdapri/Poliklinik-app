@@ -75,7 +75,7 @@
                         @foreach($riwayat->periksa->detailPeriksas as $detail)
                             <div class="bg-gray-50 p-3 rounded-lg">
                                 <p class="font-bold text-gray-800">{{ $detail->obat->nama_obat }}</p>
-                                <p class="text-sm text-gray-600">{{ $detail->jumlah }} {{ $detail->obat->satuan }}</p>
+                                <p class="text-sm text-gray-600">{{ $detail->jumlah }} {{ $detail->obat->kemasan ?? 'Pcs' }}</p>
                             </div>
                         @endforeach
                     </div>

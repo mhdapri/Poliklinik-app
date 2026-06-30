@@ -22,12 +22,16 @@ class DashboardController extends Controller
         // Mengambil data poli untuk tabel di dashboard (beserta jumlah dokter di tiap poli)
         $polis = Poli::withCount('dokter')->get();
 
+        // Mengambil data obat dengan stok kritis (menipis <= 10 ATAU habis = 0)
+        $lowStockObats = Obat::where('stok', '<=', 10)->orderBy('stok', 'asc')->take(5)->get();
+
         return view('admin.dashboard', compact(
             'totalPoli', 
             'totalDokter', 
             'totalPasien', 
             'totalObat', 
-            'polis'
+            'polis',
+            'lowStockObats'
         ));
     }
 }

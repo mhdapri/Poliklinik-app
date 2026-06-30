@@ -82,6 +82,34 @@ class ObatController extends Controller
             ->with('type', 'success');
     }
 
+    public function adjustStock(Request $request, string $id)
+    {
+        $request->validate([
+            'action' => 'required|in:add,reduce',
+            'jumlah' => 'required|integer|min:1',
+        ]);
+
+        $obat = Obat::findOrFail($id);
+
+        if ($request->action === 'reduce' && $obat->stok < $request->jumlah) {
+            return back()->with('error', 'Stok tidak cukup untuk dikurangi.');
+        }
+
+        if ($request->action === 'add') {
+            $obat->stok += $request->jumlah;
+        } else {
+            $obat->stok -= $request->jumlah;
+        }
+
+        $obat->save();
+
+        $message = $request->action === 'add'
+            ? "Stok obat {$obat->nama_obat} berhasil ditambah {$request->jumlah} unit."
+            : "Stok obat {$obat->nama_obat} berhasil dikurangi {$request->jumlah} unit.";
+
+        return redirect()->route('obat.index')->with('message', $message)->with('type', 'success');
+    }
+
     public function export()
     {
         $data = ExportService::exportObatData();

@@ -126,6 +126,40 @@
                         </a>
                     </div>
                 </div>
+
+                {{-- Pemberitahuan Stok Obat Kritis/Habis --}}
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-triangle-exclamation text-amber-500"></i>
+                        Peringatan Stok Obat
+                    </h2>
+                    
+                    @if($lowStockObats->count() > 0)
+                        <div class="space-y-3">
+                            @foreach($lowStockObats as $obat)
+                                <div class="flex items-center justify-between p-3 rounded-xl border border-gray-100 @if($obat->stok <= 0) bg-rose-50/50 @else bg-amber-50/20 @endif">
+                                    <div>
+                                        <p class="font-bold text-gray-850 text-sm">{{ $obat->nama_obat }}</p>
+                                        <p class="text-[10px] text-gray-400 font-medium">Kemasan: {{ $obat->kemasan ?? '-' }}</p>
+                                    </div>
+                                    @if($obat->stok <= 0)
+                                        <span class="bg-rose-100 text-rose-700 px-2.5 py-1 rounded-full text-[10px] font-black uppercase animate-pulse">Habis</span>
+                                    @else
+                                        <span class="bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full text-[10px] font-black uppercase">Sisa: {{ $obat->stok }}</span>
+                                    @endif
+                                </div>
+                            @endforeach
+                            <a href="{{ route('obat.index') }}" class="block text-center text-xs font-bold text-blue-600 hover:underline mt-2">
+                                Kelola & Tambah Stok →
+                            </a>
+                        </div>
+                    @else
+                        <div class="text-center py-6 text-gray-400 text-sm">
+                            <i class="fas fa-circle-check text-emerald-500 text-2xl mb-2 block"></i>
+                            Stok semua obat terpantau aman.
+                        </div>
+                    @endif
+                </div>
             </div>
         </div>
     </div>
